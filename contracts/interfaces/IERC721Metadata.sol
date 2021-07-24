@@ -1,4 +1,4 @@
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.1;
 
 /* is ERC721 */
 interface IERC721Metadata {
