@@ -22,6 +22,7 @@ contract ERC721Test is
     IERC721,
     IERC721Metadata,
     IERC721Enumerable,
+    IERC721Receiver,
     Ownable,
     IERC2309
 {
@@ -656,5 +657,16 @@ contract ERC721Test is
 
     function toggleReserveName(string memory str, bool isReserve) internal {
         _nameReserved[toLower(str)] = isReserve;
+    }
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+
+         return _ERC721_RECEIVED;
+
     }
 }

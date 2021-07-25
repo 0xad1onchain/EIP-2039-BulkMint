@@ -1,5 +1,11 @@
+const { BigNumber } = require("@ethersproject/bignumber");
 const { expect } = require("chai");
 const hre = require("hardhat");
+
+
+function range(start, end) {
+    return Array.from({ length: end - start + 1 }, (_, i) => i)
+}
 
 const div = (x, y) => {
 
@@ -32,6 +38,12 @@ const checkBigIntLte = (result, expected) => {
     expect(res).to.equal(true)
 }
 
+async function getLatestTimeStamp () {
+    const result =  await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+    return BigNumber.from(result.timestamp);
+
+}
+
 describe('Testing Project', () => {
 
     let NFTContract, NCTContract;
@@ -41,6 +53,9 @@ describe('Testing Project', () => {
     const nftarg2 = "NPTS";
     const nctarg1 = "NameChangeToken";
     const nctarg2 = "NCT";
+    let nctDeployTimeStamp;
+    let nftDeployTimeStamp;
+
 
     //Deploy the Contract
     before(async () => {
@@ -48,6 +63,23 @@ describe('Testing Project', () => {
         
         NCTContract = await hre.ethers.getContractFactory("NameChangeToken");
         nct = await NCTContract.deploy("NameChangeToken", "NCT");
+
+        nctDeployTimeStamp = await getLatestTimeStamp();
+
+       // console.log("Logging BlockHash\n");
+      //  console.log(nct);
+      //console.log("NCT DEPLOY");
+       //const blockNumber = (nct.deployTransaction.blockNumber);
+
+     // const result =  await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
+     // console.log("result is");
+      //console.log(result.timestamp);
+
+     //  const block = await hre.network.provider.getBlock(nct.deployTransaction.blockNumber);
+    //     console.log("Log Network Provider\n");
+    //    console.log(hre.network.provider);
+    //    console.log("Block");
+    //    console.log(block);
 
         await nct.deployed();
 
@@ -137,7 +169,7 @@ describe('Testing Project', () => {
                expect(totalSupply).to.equal(2);
         });
         
-        it.only("Transfer Tests", async () => {
+        it("Transfer Tests", async () => {
             const bulkQuantity = 100;
             await nft.mintBulk(bulkQuantity, deployer.address);
             await nft.mintBulk(bulkQuantity, deployer.address);
@@ -161,13 +193,79 @@ describe('Testing Project', () => {
             //console.log(nft);
 
             const nftconnected = nft.connect(addr1);
-            console.log(nftconnected);
             await nftconnected['safeTransferFrom(address,address,uint256)'](addr1.address, deployer.address, 2);
 
             owner = await nft.ownerOf(2);
 
             expect(owner).to.equal(deployer.address);
+
+            await nft['safeTransferFrom(address,address,uint256)'](deployer.address, nft.address, 3);
+
+            owner = await nft.ownerOf(3);       
             
+            expect(owner).to.equal(nft.address);
+        });
+
+        it("Tests with NCT for Single Token", async () => {
+            emissionPerDay = await nct.emissionPerDay();
+
+            initalAllotment = await nct.INITIAL_ALLOTMENT();
+            secondsPerDay = await  nct.SECONDS_IN_A_DAY();
+            await nft.mint(deployer.address);
+
+            await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            await nct.claim([0]);
+            const TimeStamp = await getLatestTimeStamp();
+            balance = await nct.balanceOf(deployer.address);
+            
+            v1 = currTimeStamp.sub(nctDeployTimeStamp);
+            v2 = v1.mul(emissionPerDay);
+            v3 = v2.div(secondsPerDay);
+            v4 = v3.add(initalAllotment);
+            checkBigIntEquality(v4, balance);
+
+            // await nft.mint(deployer.address);
+
+            // await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            // await nct.claim([0,1]);
+
+            // const TimeStamp2 = await getLatestTimeStamp();
+
+        });
+
+        it.only("Tests with NCT for Multiple Token", async () => {
+            emissionPerDay = await nct.emissionPerDay();
+
+            initalAllotment = await nct.INITIAL_ALLOTMENT();
+            secondsPerDay = await  nct.SECONDS_IN_A_DAY();
+            bulkQty = 100;
+            await nft.mintBulk(bulkQty, deployer.address);
+
+            await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            var arr = range(0,99);
+            //console.log(arr);
+            await nct.claim(arr);
+            const TimeStamp = await getLatestTimeStamp();
+            balance = await nct.balanceOf(deployer.address);
+            
+            v1 = TimeStamp.sub(nctDeployTimeStamp);
+            v2 = v1.mul(emissionPerDay);
+            v3 = v2.div(secondsPerDay);
+            v4 = v3.add(initalAllotment);
+            v5 = v4.mul(bulkQty);
+            checkBigIntEquality(v5, balance);
+
+            // await nft.mint(deployer.address);
+
+            // await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            // await nct.claim([0,1]);
+
+            // const TimeStamp2 = await getLatestTimeStamp();
+
         });
 
     } )

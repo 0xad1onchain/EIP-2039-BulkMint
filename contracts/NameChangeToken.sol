@@ -5,6 +5,7 @@ import "./libs/SafeMath.sol";
 import "./interfaces/IERC20.sol";
 import "./libs/Context.sol";
 import "./interfaces/IERC721Enumerable.sol";
+import "hardhat/console.sol";
 
 
 
@@ -131,8 +132,10 @@ contract NameChangeToken is Context, IERC20 {
         if (lastClaimed >= emissionEnd) return 0;
 
         uint256 accumulationPeriod = block.timestamp < emissionEnd ? block.timestamp : emissionEnd; // Getting the min value of both
+        uint256 temp = accumulationPeriod.sub(lastClaimed);
+        console.log(temp);
         uint256 totalAccumulated = accumulationPeriod.sub(lastClaimed).mul(emissionPerDay).div(SECONDS_IN_A_DAY);
-
+        console.log(totalAccumulated);
         // If claim hasn't been done before for the index, add initial allotment (plus prereveal multiplier if applicable)
         if (lastClaimed == emissionStart) {
             uint256 initialAllotment = INITIAL_ALLOTMENT;
