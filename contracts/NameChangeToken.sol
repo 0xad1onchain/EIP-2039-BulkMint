@@ -7,8 +7,6 @@ import "./libs/Context.sol";
 import "./interfaces/IERC721Enumerable.sol";
 import "hardhat/console.sol";
 
-
-
 /**
  *
  * NameChangeToken Contract (The native token of Hashmasks)
@@ -20,21 +18,21 @@ contract NameChangeToken is Context, IERC20 {
     // Constants
     uint256 public SECONDS_IN_A_DAY = 86400;
 
-    uint256 public constant INITIAL_ALLOTMENT = 1830 * (10 ** 18);
+    uint256 public constant INITIAL_ALLOTMENT = 1830 * (10**18);
 
     uint256 public constant PRE_REVEAL_MULTIPLIER = 2;
 
     // Public variables
     uint256 public emissionStart;
 
-    uint256 public emissionEnd; 
+    uint256 public emissionEnd;
 
-    uint256 public emissionPerDay = 10 * (10 ** 18);
+    uint256 public emissionPerDay = 10 * (10**18);
 
-    mapping (address => uint256) private _balances;
+    mapping(address => uint256) private _balances;
 
-    mapping (address => mapping (address => uint256)) private _allowances;
-    
+    mapping(address => mapping(address => uint256)) private _allowances;
+
     mapping(uint256 => uint256) private _lastClaim;
 
     uint256 private _totalSupply;
@@ -53,7 +51,7 @@ contract NameChangeToken is Context, IERC20 {
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor (string memory name, string memory symbol) {
+    constructor(string memory name, string memory symbol) {
         _name = name;
         _symbol = symbol;
         _decimals = 18;
@@ -106,36 +104,58 @@ contract NameChangeToken is Context, IERC20 {
     function balanceOf(address account) public view override returns (uint256) {
         return _balances[account];
     }
-    
+
     /**
      * @dev When accumulated NCTs have last been claimed for a Hashmask index
      */
     function lastClaim(uint256 tokenIndex) public view returns (uint256) {
-        require(IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0), "Owner cannot be 0 address");
-        require(tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(), "NFT at index has not been minted yet");
+        require(
+            IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0),
+            "Owner cannot be 0 address"
+        );
+        require(
+            tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(),
+            "NFT at index has not been minted yet"
+        );
 
-        uint256 lastClaimed = uint256(_lastClaim[tokenIndex]) != 0 ? uint256(_lastClaim[tokenIndex]) : emissionStart;
+        uint256 lastClaimed = uint256(_lastClaim[tokenIndex]) != 0
+            ? uint256(_lastClaim[tokenIndex])
+            : emissionStart;
         return lastClaimed;
     }
-    
+
     /**
      * @dev Accumulated NCT tokens for a Hashmask token index.
      */
     function accumulated(uint256 tokenIndex) public view returns (uint256) {
-        require(block.timestamp > emissionStart, "Emission has not started yet");
-        require(IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0), "Owner cannot be 0 address");
-        require(tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(), "NFT at index has not been minted yet");
+        require(
+            block.timestamp > emissionStart,
+            "Emission has not started yet"
+        );
+        require(
+            IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0),
+            "Owner cannot be 0 address"
+        );
+        require(
+            tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(),
+            "NFT at index has not been minted yet"
+        );
 
         uint256 lastClaimed = lastClaim(tokenIndex);
 
         // Sanity check if last claim was on or after emission end
         if (lastClaimed >= emissionEnd) return 0;
 
-        uint256 accumulationPeriod = block.timestamp < emissionEnd ? block.timestamp : emissionEnd; // Getting the min value of both
+        uint256 accumulationPeriod = block.timestamp < emissionEnd
+            ? block.timestamp
+            : emissionEnd; // Getting the min value of both
         uint256 temp = accumulationPeriod.sub(lastClaimed);
-        console.log(temp);
-        uint256 totalAccumulated = accumulationPeriod.sub(lastClaimed).mul(emissionPerDay).div(SECONDS_IN_A_DAY);
-        console.log(totalAccumulated);
+        // console.log(temp);
+        uint256 totalAccumulated = accumulationPeriod
+        .sub(lastClaimed)
+        .mul(emissionPerDay)
+        .div(SECONDS_IN_A_DAY);
+        // console.log(totalAccumulated);
         // If claim hasn't been done before for the index, add initial allotment (plus prereveal multiplier if applicable)
         if (lastClaimed == emissionStart) {
             uint256 initialAllotment = INITIAL_ALLOTMENT;
@@ -148,29 +168,43 @@ contract NameChangeToken is Context, IERC20 {
     /**
      * @dev Permissioning not added because it is only callable once. It is set right after deployment and verified.
      */
-    function setMasksAddress(address masksAddress) public {
+    function setNFTAddress(address masksAddress) public {
         require(_masksAddress == address(0), "Already set");
-        
+
         _masksAddress = masksAddress;
     }
-    
+
     /**
      * @dev Claim mints NCTs and supports multiple Hashmask token indices at once.
      */
     function claim(uint256[] memory tokenIndices) public returns (uint256) {
-        require(block.timestamp > emissionStart, "Emission has not started yet");
+        require(
+            block.timestamp > emissionStart,
+            "Emission has not started yet"
+        );
 
         uint256 totalClaimQty = 0;
-        for (uint i = 0; i < tokenIndices.length; i++) {
+        for (uint256 i = 0; i < tokenIndices.length; i++) {
             // Sanity check for non-minted index
-            require(tokenIndices[i] < IERC721Enumerable(_masksAddress).totalSupply(), "NFT at index has not been minted yet");
+            require(
+                tokenIndices[i] <
+                    IERC721Enumerable(_masksAddress).totalSupply(),
+                "NFT at index has not been minted yet"
+            );
             // Duplicate token index check
-            for (uint j = i + 1; j < tokenIndices.length; j++) {
-                require(tokenIndices[i] != tokenIndices[j], "Duplicate token index");
+            for (uint256 j = i + 1; j < tokenIndices.length; j++) {
+                require(
+                    tokenIndices[i] != tokenIndices[j],
+                    "Duplicate token index"
+                );
             }
 
-            uint tokenIndex = tokenIndices[i];
-            require(IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) == msg.sender, "Sender is not the owner");
+            uint256 tokenIndex = tokenIndices[i];
+            require(
+                IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) ==
+                    msg.sender,
+                "Sender is not the owner"
+            );
 
             uint256 claimQty = accumulated(tokenIndex);
             if (claimQty != 0) {
@@ -180,7 +214,7 @@ contract NameChangeToken is Context, IERC20 {
         }
 
         require(totalClaimQty != 0, "No accumulated NCT");
-        _mint(msg.sender, totalClaimQty); 
+        _mint(msg.sender, totalClaimQty);
         return totalClaimQty;
     }
 
@@ -192,7 +226,12 @@ contract NameChangeToken is Context, IERC20 {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+    function transfer(address recipient, uint256 amount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
@@ -200,7 +239,13 @@ contract NameChangeToken is Context, IERC20 {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
+    function allowance(address owner, address spender)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return _allowances[owner][spender];
     }
 
@@ -211,7 +256,12 @@ contract NameChangeToken is Context, IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+    function approve(address spender, uint256 amount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         _approve(_msgSender(), spender, amount);
         return true;
     }
@@ -229,11 +279,22 @@ contract NameChangeToken is Context, IERC20 {
      * - the caller must have allowance for ``sender``'s tokens of at least
      * `amount`.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public virtual override returns (bool) {
         _transfer(sender, recipient, amount);
         // Approval check is skipped if the caller of transferFrom is the Hashmasks contract. For better UX.
         if (msg.sender != _masksAddress) {
-            _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+            _approve(
+                sender,
+                _msgSender(),
+                _allowances[sender][_msgSender()].sub(
+                    amount,
+                    "ERC20: transfer amount exceeds allowance"
+                )
+            );
         }
         return true;
     }
@@ -250,8 +311,16 @@ contract NameChangeToken is Context, IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+    function increaseAllowance(address spender, uint256 addedValue)
+        public
+        virtual
+        returns (bool)
+    {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender].add(addedValue)
+        );
         return true;
     }
 
@@ -266,6 +335,7 @@ contract NameChangeToken is Context, IERC20 {
         _burn(msg.sender, burnQuantity);
         return true;
     }
+
     // ++
 
     /**
@@ -282,8 +352,19 @@ contract NameChangeToken is Context, IERC20 {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        virtual
+        returns (bool)
+    {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender].sub(
+                subtractedValue,
+                "ERC20: decreased allowance below zero"
+            )
+        );
         return true;
     }
 
@@ -301,13 +382,20 @@ contract NameChangeToken is Context, IERC20 {
      * - `recipient` cannot be the zero address.
      * - `sender` must have a balance of at least `amount`.
      */
-    function _transfer(address sender, address recipient, uint256 amount) internal virtual {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal virtual {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
         _beforeTokenTransfer(sender, recipient, amount);
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[sender] = _balances[sender].sub(
+            amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
@@ -347,7 +435,10 @@ contract NameChangeToken is Context, IERC20 {
 
         _beforeTokenTransfer(account, address(0), amount);
 
-        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _balances[account] = _balances[account].sub(
+            amount,
+            "ERC20: burn amount exceeds balance"
+        );
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
@@ -365,7 +456,11 @@ contract NameChangeToken is Context, IERC20 {
      * - `owner` cannot be the zero address.
      * - `spender` cannot be the zero address.
      */
-    function _approve(address owner, address spender, uint256 amount) internal virtual {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
@@ -398,5 +493,9 @@ contract NameChangeToken is Context, IERC20 {
      *
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual { }
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual {}
 }

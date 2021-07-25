@@ -58,7 +58,7 @@ describe('Testing Project', () => {
 
 
     //Deploy the Contract
-    before(async () => {
+    beforeEach(async () => {
         [deployer, addr1, addr2, addr3, addr4] = await hre.ethers.getSigners();
         
         NCTContract = await hre.ethers.getContractFactory("NameChangeToken");
@@ -66,33 +66,14 @@ describe('Testing Project', () => {
 
         nctDeployTimeStamp = await getLatestTimeStamp();
 
-       // console.log("Logging BlockHash\n");
-      //  console.log(nct);
-      //console.log("NCT DEPLOY");
-       //const blockNumber = (nct.deployTransaction.blockNumber);
-
-     // const result =  await hre.network.provider.send("eth_getBlockByNumber", ["latest", false]);
-     // console.log("result is");
-      //console.log(result.timestamp);
-
-     //  const block = await hre.network.provider.getBlock(nct.deployTransaction.blockNumber);
-    //     console.log("Log Network Provider\n");
-    //    console.log(hre.network.provider);
-    //    console.log("Block");
-    //    console.log(block);
-
         await nct.deployed();
 
-        NFTContract = await hre.ethers.getContractFactory("ERC721Test");
+        NFTContract = await hre.ethers.getContractFactory("ERC721");
         nft = await NFTContract.deploy(nftarg1, nftarg2, nct.address);
         
         await nft.deployed();
 
-        //Set the masks address in NCT
-
-        await nct.setMasksAddress(nft.address);
-
-       // console.log("Logging NFT");
+        await nct.setNFTAddress(nft.address);
        
     });
 
@@ -101,7 +82,6 @@ describe('Testing Project', () => {
         it('Check Total Supply of NFT', async () => {
             totalSupply = await nft.totalSupply();
             expect(totalSupply).to.equal(0);
-           // console.log("First Test Case");
         });
 
         it('Check Total Supply of NCT', async() => {
@@ -190,8 +170,6 @@ describe('Testing Project', () => {
 
             expect(balance).to.equal(2);
 
-            //console.log(nft);
-
             const nftconnected = nft.connect(addr1);
             await nftconnected['safeTransferFrom(address,address,uint256)'](addr1.address, deployer.address, 2);
 
@@ -219,7 +197,7 @@ describe('Testing Project', () => {
             const TimeStamp = await getLatestTimeStamp();
             balance = await nct.balanceOf(deployer.address);
             
-            v1 = currTimeStamp.sub(nctDeployTimeStamp);
+            v1 = TimeStamp.sub(nctDeployTimeStamp);
             v2 = v1.mul(emissionPerDay);
             v3 = v2.div(secondsPerDay);
             v4 = v3.add(initalAllotment);
@@ -235,7 +213,7 @@ describe('Testing Project', () => {
 
         });
 
-        it.only("Tests with NCT for Multiple Token", async () => {
+        it("Tests with NCT for Multiple Token", async () => {
             emissionPerDay = await nct.emissionPerDay();
 
             initalAllotment = await nct.INITIAL_ALLOTMENT();
@@ -246,7 +224,6 @@ describe('Testing Project', () => {
             await hre.network.provider.send("evm_increaseTime", [86400]);
 
             var arr = range(0,99);
-            //console.log(arr);
             await nct.claim(arr);
             const TimeStamp = await getLatestTimeStamp();
             balance = await nct.balanceOf(deployer.address);

@@ -17,10 +17,9 @@ import "hardhat/console.sol";
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  */
-contract ERC721Test is
+contract ERC721 is
     ERC165,
     IERC721,
-    IERC721Metadata,
     IERC721Enumerable,
     IERC721Receiver,
     Ownable,
@@ -43,14 +42,14 @@ contract ERC721Test is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-   // Mapping for tokens owned by each address
+    // Mapping for tokens owned by each address
     mapping(address => EnumerableSet.UintSet) private _holderTokens;
 
     // Mapping from token ID to name
-    mapping (uint256 => string) private _tokenName;
+    mapping(uint256 => string) private _tokenName;
 
     // Mapping if certain name string has already been reserved
-    mapping (string => bool) private _nameReserved;
+    mapping(string => bool) private _nameReserved;
 
     // Mapping from tokenIds to tokenURIs
     //xasdsadasdasdas
@@ -58,13 +57,13 @@ contract ERC721Test is
 
     address private _nctAddress;
 
-    uint256 public constant NAME_CHANGE_PRICE = 1830 * (10 ** 18);
+    uint256 public constant NAME_CHANGE_PRICE = 1830 * (10**18);
 
-    string public override name;
+    string public name;
 
-    string public override symbol;
+    string public symbol;
 
-    uint256 public  override totalSupply;
+    uint256 public override totalSupply;
 
     address private BURN_ADDRESS = 0xc0a227a440aA6432aFeC59423Fd68BD00cAbB529;
 
@@ -85,8 +84,11 @@ contract ERC721Test is
      *   bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)'))
      */
 
-
-    constructor(string memory _name, string memory _symbol, address _NCTAddress) {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        address _NCTAddress
+    ) {
         _registerInterface(_InterfaceId_ERC721);
         name = _name;
         symbol = _symbol;
@@ -94,7 +96,8 @@ contract ERC721Test is
     }
 
     // Events
-    event NameChange (uint256 indexed maskIndex, string newName);
+    event NameChange(uint256 indexed maskIndex, string newName);
+
     /**
      * @dev Gets the balance of the specified address
      * @param owner address to query the balance of
@@ -106,7 +109,6 @@ contract ERC721Test is
             "ERC721 :: balanceOf : ownerCheck"
         );
         return _holderTokens[owner].length();
-
     }
 
     /**
@@ -208,13 +210,10 @@ contract ERC721Test is
             _isApprovedOrOwner(msg.sender, tokenId),
             "ERC721 :: transferFrom : isnt approved or you dont own it"
         );
-        console.log('transferFrom called');
         _clearApproval(from, tokenId);
         _removeTokenFrom(from, tokenId);
         _addTokenTo(to, tokenId);
-        console.log('transferFrom almost done');
         emit Transfer(from, to, tokenId);
-        console.log('transferFrom done');
     }
 
     /**
@@ -235,7 +234,6 @@ contract ERC721Test is
         uint256 tokenId
     ) external override {
         // solium-disable-next-line arg-overflow
-        console.log("Called");
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -263,40 +261,30 @@ contract ERC721Test is
         );
         transferFrom(from, to, tokenId);
         // solium-disable-next-line arg-overflow
-        console.log('transferdone');
-         require(
-             _checkOnERC721Received(from, to, tokenId, _data),
-             "ERC721 :: safeTransferFrom : onReceivedTokens Failed"
-         );
+        require(
+            _checkOnERC721Received(from, to, tokenId, _data),
+            "ERC721 :: safeTransferFrom : onReceivedTokens Failed"
+        );
     }
 
-    function tokenURI(uint256 _tokenId) public view override returns(string memory _uri){
-        string memory baseuri = BASEURI;
+    // function tokenURI(uint256 _tokenId)
+    //     public
+    //     view
+    //     override
+    //     returns (string memory _uri)
+    // {
+    //     string memory baseuri = BASEURI;
 
-    //     bytes memory temp =  bytes("QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99");
-
-    //   //  console.log(temp);
-    //     console.log(temp.length);
-    //     console.log(temp2.length);
-    //     console.log(string(temp2));
-    //     console.log("Hello\n");
-    //         console.logBytes(temp);
-    //     console.log("\n\n");
-    
-    //     console.log(string(abi.encodePacked(baseuri, temp)));
-    //     console.log(string(abi.encodePacked(baseuri, temp2)));
-
-       // return string(abi.encodePacked(baseuri, temp));
-        return string(abi.encodePacked(baseuri, _tokenURIs[_tokenId]));
-
-    }
+    //     // return string(abi.encodePacked(baseuri, temp));
+    //     return string(abi.encodePacked(baseuri, _tokenURIs[_tokenId]));
+    // }
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
     /// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
     ///  3986. The URI may point to a JSON file that conforms to the "ERC721
     ///  Metadata JSON Schema".
 
-    //Neo Pets 
+    //Neo Pets
     //Pokemon
     /*
     function tok(uint256 _tokenId)
@@ -324,17 +312,16 @@ contract ERC721Test is
     }
     */
 
-    function setTokenURI(uint256 _tokenId, bytes memory _uri)
-        public
-        onlyOwner()
-    {
-        require(
-            _exists(_tokenId),
-            "ERC721 :: setTokenURI : token does not exist"
-        );
-       _tokenURIs[_tokenId] = _uri;
-       console.log(_uri.length);
-    }
+    // function setTokenURI(uint256 _tokenId, bytes memory _uri)
+    //     public
+    //     onlyOwner()
+    // {
+    //     require(
+    //         _exists(_tokenId),
+    //         "ERC721 :: setTokenURI : token does not exist"
+    //     );
+    //     _tokenURIs[_tokenId] = _uri;
+    // }
 
     /*
     function setBulkTokenURI(uint256 _tokenIdStart, uint256 _tokenIdStop, bytes memory _uri) public onlyOwner()
@@ -343,7 +330,7 @@ contract ERC721Test is
     }
     */
 
-/*
+    /*
         function setBulkTokenUris(
         uint256 startToken,
         uint256 quantity,
@@ -366,7 +353,7 @@ contract ERC721Test is
     /// @param _index A counter less than `balanceOf(_owner)`
     /// @return The token identifier for the `_index`th NFT assigned to `_owner`,
     ///   (sort order not specified)
-    
+
     function tokenOfOwnerByIndex(address _owner, uint256 _index)
         external
         view
@@ -377,10 +364,8 @@ contract ERC721Test is
             _index < balanceOf(_owner),
             "ERC721 :: tokenOfOwnerByIndex : owner does not have these many tokens"
         );
-       return _holderTokens[_owner].at(_index);
-      
+        return _holderTokens[_owner].at(_index);
     }
-    
 
     /// @notice Enumerate valid NFTs
     /// @dev Throws if `_index` >= `totalSupply()`.
@@ -442,7 +427,7 @@ contract ERC721Test is
         );
         uint256 tokenId = totalSupply;
 
-       // require(tokenId == totalSupply , "ERC721 :: _mint: Token ID should be equal to the Total Supply");
+        // require(tokenId == totalSupply , "ERC721 :: _mint: Token ID should be equal to the Total Supply");
 
         _addTokenTo(to, tokenId);
         emit Transfer(address(0), to, tokenId);
@@ -455,23 +440,16 @@ contract ERC721Test is
     function mintBulk(uint256 quantity, address to) public onlyOwner {
         uint256 fromTokenId = totalSupply;
         uint256 endTokenId = quantity + totalSupply;
-       require(to != address(0));
-        
+        require(to != address(0));
+
         for (uint256 i = fromTokenId; i < endTokenId; i++) {
             _holderTokens[to].add(i);
-            _tokenOwner[i] = to;    
+            _tokenOwner[i] = to;
         }
-        
+
         totalSupply = totalSupply.add(quantity);
-        emit ConsecutiveTransfer(
-            fromTokenId,
-            totalSupply - 1,
-            address(0),
-            to
-        );
+        emit ConsecutiveTransfer(fromTokenId, totalSupply - 1, address(0), to);
     }
-
-
 
     // /**
     //  * @dev Internal function to burn a specific token
@@ -497,16 +475,15 @@ contract ERC721Test is
             ownerOf(tokenId) == BURN_ADDRESS || ownerOf(tokenId) == address(0),
             "ERC721 :: _addTokenTo : token already exists"
         );
-        console.log(tokenId);
         _tokenOwner[tokenId] = to;
-       _holderTokens[to].add(tokenId);
+        _holderTokens[to].add(tokenId);
     }
 
     /**
      * @dev Withdraw ether from this contract (Callable by owner)
-    */
-    function withdraw() onlyOwner payable public {
-        uint balance = address(this).balance;
+     */
+    function withdraw() public payable onlyOwner {
+        uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
     }
 
@@ -523,7 +500,7 @@ contract ERC721Test is
             ownerOf(tokenId) == from,
             "ERC721 :: _removeTokenFrom : token not owned by from address"
         );
-      _holderTokens[from].remove(tokenId);
+        _holderTokens[from].remove(tokenId);
         _tokenOwner[tokenId] = BURN_ADDRESS;
         totalSupply = totalSupply.sub(1);
     }
@@ -537,7 +514,7 @@ contract ERC721Test is
      * @param _data bytes optional data to send along with the call
      * @return whether the call correctly returned the expected magic value
      */
-    
+
     function _checkOnERC721Received(
         address from,
         address to,
@@ -572,44 +549,51 @@ contract ERC721Test is
         }
     }
 
-        /**
+    /**
      * @dev Returns name of the NFT at index.
      */
-    function tokenNameByIndex(uint256 index) public view returns (string memory) {
+    function tokenNameByIndex(uint256 index)
+        public
+        view
+        returns (string memory)
+    {
         return _tokenName[index];
     }
 
-     /**
+    /**
      * @dev Returns if the name has been reserved.
      */
-    function isNameReserved(string memory nameString) public view returns (bool) {
+    function isNameReserved(string memory nameString)
+        public
+        view
+        returns (bool)
+    {
         return _nameReserved[toLower(nameString)];
     }
 
     /**
      * @dev Check if the name string is valid (Alphanumeric and spaces without leading or trailing space)
      */
-    function validateName(string memory str) public pure returns (bool){
+    function validateName(string memory str) public pure returns (bool) {
         bytes memory b = bytes(str);
-        if(b.length < 1) return false;
-        if(b.length > 25) return false; // Cannot be longer than 25 characters
-        if(b[0] == 0x20) return false; // Leading space
+        if (b.length < 1) return false;
+        if (b.length > 25) return false; // Cannot be longer than 25 characters
+        if (b[0] == 0x20) return false; // Leading space
         if (b[b.length - 1] == 0x20) return false; // Trailing space
 
         bytes1 lastChar = b[0];
 
-        for(uint i; i<b.length; i++){
+        for (uint256 i; i < b.length; i++) {
             bytes1 char = b[i];
 
             if (char == 0x20 && lastChar == 0x20) return false; // Cannot contain continous spaces
 
-            if(
+            if (
                 !(char >= 0x30 && char <= 0x39) && //9-0
                 !(char >= 0x41 && char <= 0x5A) && //A-Z
                 !(char >= 0x61 && char <= 0x7A) && //a-z
                 !(char == 0x20) //space
-            )
-                return false;
+            ) return false;
 
             lastChar = char;
         }
@@ -617,13 +601,13 @@ contract ERC721Test is
         return true;
     }
 
-      /**
+    /**
      * @dev Converts the string to lowercase
      */
-    function toLower(string memory str) public pure returns (string memory){
+    function toLower(string memory str) public pure returns (string memory) {
         bytes memory bStr = bytes(str);
         bytes memory bLower = new bytes(bStr.length);
-        for (uint i = 0; i < bStr.length; i++) {
+        for (uint256 i = 0; i < bStr.length; i++) {
             // Uppercase character
             if ((uint8(bStr[i]) >= 65) && (uint8(bStr[i]) <= 90)) {
                 bLower[i] = bytes1(uint8(bStr[i]) + 32);
@@ -633,7 +617,8 @@ contract ERC721Test is
         }
         return string(bLower);
     }
-        /**
+
+    /**
      * @dev Changes the name for Hashmask tokenId
      */
     function changeName(uint256 tokenId, string memory newName) public {
@@ -641,10 +626,17 @@ contract ERC721Test is
 
         require(_msgSender() == owner, "ERC721: caller is not the owner");
         require(validateName(newName) == true, "Not a valid new name");
-        require(sha256(bytes(newName)) != sha256(bytes(_tokenName[tokenId])), "New name is same as the current one");
+        require(
+            sha256(bytes(newName)) != sha256(bytes(_tokenName[tokenId])),
+            "New name is same as the current one"
+        );
         require(isNameReserved(newName) == false, "Name already reserved");
 
-        IERC20(_nctAddress).transferFrom(msg.sender, address(this), NAME_CHANGE_PRICE);
+        IERC20(_nctAddress).transferFrom(
+            msg.sender,
+            address(this),
+            NAME_CHANGE_PRICE
+        );
         // If already named, dereserve old name
         if (bytes(_tokenName[tokenId]).length > 0) {
             toggleReserveName(_tokenName[tokenId], false);
@@ -665,8 +657,6 @@ contract ERC721Test is
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
-
-         return _ERC721_RECEIVED;
-
+        return _ERC721_RECEIVED;
     }
 }
