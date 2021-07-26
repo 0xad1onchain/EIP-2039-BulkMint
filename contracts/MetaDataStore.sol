@@ -13,7 +13,8 @@ contract MetadataStore is Ownable {
     bytes2 private CONSTANT = 0x1220;
 
     // Internal variables
-    bytes internal constant _ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    bytes internal constant _ALPHABET =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     constructor(address nftAddress) {
         _nftaddress = nftAddress;
@@ -24,32 +25,38 @@ contract MetadataStore is Ownable {
     Ordered according to original hashed sequence pertaining to the Hashmasks provenance
     Ownership is intended to be burned (Renounced) after storage is completed
     */
-   // bytes32 is already an array of fixed lengh
-    function storeMetadata(bytes32[] memory ipfsHashInHex, uint256 startIndex, uint256 qty)
-        public
-        onlyOwner
-    {
-        require(IERC721Enumerable(_nftaddress).totalSupply() >= (startIndex + qty), "Token Not yet Minted");
-        
-        for(uint256 temp = startIndex; temp < (startIndex + qty); temp++) {
-                ipfsHashes[temp] = ipfsHashInHex[temp - startIndex]; 
+    // bytes32 is already an array of fixed lengh
+    function storeMetadata(
+        bytes32[] memory ipfsHashInHex,
+        uint256 startIndex,
+        uint256 qty
+    ) public onlyOwner {
+        console.log("started storing metadata");
+        require(
+            IERC721Enumerable(_nftaddress).totalSupply() >= (startIndex + qty),
+            "Token Not yet Minted"
+        );
+        console.log("at the loop", ipfsHashInHex.length);
+        // ipfsHashes[0] = ipfsHashInHex[0];
+        for (uint256 i = startIndex; i < (startIndex + qty); i++) {
+            ipfsHashes.push(ipfsHashInHex[i]);
         }
     }
 
     function getTokenURI(uint256 tokenIndex)
         public
         view
-        returns (string memory result) 
+        returns (string memory result)
     {
         require(tokenIndex < ipfsHashes.length, "MetaData Does Not Exist");
         //Hex to Base58
-        bytes memory temp = abi.encodePacked(CONSTANT,  ipfsHashes[tokenIndex]);
+        bytes memory temp = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
         result = string(abi.encodePacked(BASE_URI, _toBase58(temp)));
         console.log(result);
-       // return abi.encodePacked(BASE_URI, ipfsHashes[tokenIndex]);
+        // return abi.encodePacked(BASE_URI, ipfsHashes[tokenIndex]);
     }
-    
-       // Source: verifyIPFS (https://github.com/MrChico/verifyIPFS/blob/master/contracts/verifyIPFS.sol)
+
+    // Source: verifyIPFS (https://github.com/MrChico/verifyIPFS/blob/master/contracts/verifyIPFS.sol)
     // @author Martin Lundfall (martin.lundfall@consensys.net)
     // @dev Converts hex string to base 58
     function _toBase58(bytes memory source)
@@ -113,5 +120,4 @@ contract MetadataStore is Ownable {
         }
         return output;
     }
-
 }

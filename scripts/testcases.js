@@ -316,16 +316,20 @@ describe('Testing Project', () => {
             arrtemp = ["QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99"];
             arr2 = ["ABCD"];
             //IPFS it 
-            tempstring = "RHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
+            tempstring = "QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
             arr2 = [tempstring, tempstring, tempstring];
             //Base58
 
            // val = hre.ethers.utils.arrayify('QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99');
             console.log("My val");
-            const bytes = hre.ethers.utils.base58.decode(arr2[0]);
+            let bytes = hre.ethers.utils.base58.decode(arr2[0]);
          // const bytes2 = bs58.decode(arr2[0]);
             console.log(bytes);
+            bytes = bytes.subarray(2, bytes.length);
+            console.log(bytes);
+            console.log(bytes.toString());
             console.log(typeof(bytes));
+            console.log(hre.ethers.utils.base58.encode(bytes));
            // console.log(bytes2);
            // console.log(bytes.length);
 
@@ -356,9 +360,11 @@ describe('Testing Project', () => {
             // console.log(decoded);
             // console.log(decoded.length);
            
-            await metadata.storeMetadata([bytes], 0, 1);
+            await metadata.storeMetadata([bytes, bytes], 0, 1);
 
-            uri = await nft.getTokenURI(0);
+            console.log('stored it all');
+
+            uri = await metadata.getTokenURI(0);
             
             console.log(uri);
 
