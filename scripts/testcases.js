@@ -309,9 +309,13 @@ describe('Testing Project', () => {
 
         it.only("MetaData Tests", async() => {
 
-            await nft.mint(deployer.address);
-            await nft.mint(deployer.address);
-            await nft.mint(deployer.address);
+            // await nft.mint(deployer.address);
+            // await nft.mint(deployer.address);
+            // await nft.mint(deployer.address);
+
+            await nft.mintBulk(150, deployer.address);
+            await nft.mintBulk(150, deployer.address);
+            await nft.mintBulk(150, deployer.address);
             
             arrtemp = ["QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99"];
             arr2 = ["ABCD"];
@@ -349,6 +353,10 @@ describe('Testing Project', () => {
             // console.log(temp2.length);
 
             console.log("Second Log");
+            let ipfshashes = [];
+            for (var i = 0; i < 450; i++) {
+                ipfshashes.push(bytes);
+            }
            // const bytes2 = Buffer.from(hexval, 'hex');
            // reconvert = bs58.encode(bytes2);
            // console.log(reconvert);
@@ -359,12 +367,11 @@ describe('Testing Project', () => {
             // decoded = toHexString(from_b58(tempstring, MAP)).toUpperCase();
             // console.log(decoded);
             // console.log(decoded.length);
-           
-            await metadata.storeMetadata([bytes, bytes], 0, 1);
+            await metadata.storeMetadata(ipfshashes);
 
             console.log('stored it all');
 
-            uri = await metadata.getTokenURI(0);
+            uri = await metadata.getTokenURI(149);
             
             console.log(uri);
 

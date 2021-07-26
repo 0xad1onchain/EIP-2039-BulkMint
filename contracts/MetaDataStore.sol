@@ -26,19 +26,14 @@ contract MetadataStore is Ownable {
     Ownership is intended to be burned (Renounced) after storage is completed
     */
     // bytes32 is already an array of fixed lengh
-    function storeMetadata(
-        bytes32[] memory ipfsHashInHex,
-        uint256 startIndex,
-        uint256 qty
-    ) public onlyOwner {
+    function storeMetadata(bytes32[] memory ipfsHashInHex) public onlyOwner {
         console.log("started storing metadata");
         require(
-            IERC721Enumerable(_nftaddress).totalSupply() >= (startIndex + qty),
+            IERC721Enumerable(_nftaddress).totalSupply() >=
+                (ipfsHashes.length + ipfsHashInHex.length),
             "Token Not yet Minted"
         );
-        console.log("at the loop", ipfsHashInHex.length);
-        // ipfsHashes[0] = ipfsHashInHex[0];
-        for (uint256 i = startIndex; i < (startIndex + qty); i++) {
+        for (uint256 i = 0; i < ipfsHashInHex.length; i++) {
             ipfsHashes.push(ipfsHashInHex[i]);
         }
     }
@@ -52,8 +47,6 @@ contract MetadataStore is Ownable {
         //Hex to Base58
         bytes memory temp = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
         result = string(abi.encodePacked(BASE_URI, _toBase58(temp)));
-        console.log(result);
-        // return abi.encodePacked(BASE_URI, ipfsHashes[tokenIndex]);
     }
 
     // Source: verifyIPFS (https://github.com/MrChico/verifyIPFS/blob/master/contracts/verifyIPFS.sol)
