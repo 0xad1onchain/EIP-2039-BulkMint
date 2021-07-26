@@ -9,7 +9,8 @@ contract MetadataStore is Ownable {
 
     bytes32[] public ipfsHashes;
     address private _nftaddress;
-    string private BASE_URI = "https://ipfs.infura.io/ipfs/";
+    string private BASE_URI_PREFIX;
+    string private BASE_URI_SUFFIX;
     bytes2 private CONSTANT = 0x1220;
 
     // Internal variables
@@ -18,6 +19,8 @@ contract MetadataStore is Ownable {
 
     constructor(address nftAddress) {
         _nftaddress = nftAddress;
+        BASE_URI_PREFIX = "https://ipfs.infura.io/ipfs/";
+        BASE_URI_SUFFIX = "/";
     }
 
     /*
@@ -25,7 +28,6 @@ contract MetadataStore is Ownable {
     Ordered according to original hashed sequence pertaining to the Hashmasks provenance
     Ownership is intended to be burned (Renounced) after storage is completed
     */
-    // bytes32 is already an array of fixed lengh
     function storeMetadata(bytes32[] memory ipfsHashInHex) public onlyOwner {
         console.log("started storing metadata");
         require(
@@ -46,7 +48,9 @@ contract MetadataStore is Ownable {
         require(tokenIndex < ipfsHashes.length, "MetaData Does Not Exist");
         //Hex to Base58
         bytes memory temp = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
-        result = string(abi.encodePacked(BASE_URI, _toBase58(temp)));
+        result = string(
+            abi.encodePacked(BASE_URI_PREFIX, _toBase58(temp), BASE_URI_SUFFIX)
+        );
     }
 
     // Source: verifyIPFS (https://github.com/MrChico/verifyIPFS/blob/master/contracts/verifyIPFS.sol)
@@ -76,6 +80,14 @@ contract MetadataStore is Ownable {
             }
         }
         return string(_toAlphabet(_reverse(_truncate(digits, digitlength))));
+    }
+
+    function updateBaseUri(
+        string memory _BASE_URI_PREFIX,
+        string memory _BASE_URI_SUFFIX
+    ) external onlyOwner() {
+        BASE_URI_PREFIX = _BASE_URI_PREFIX;
+        BASE_URI_SUFFIX = _BASE_URI_SUFFIX;
     }
 
     function _truncate(uint8[] memory array, uint8 length)

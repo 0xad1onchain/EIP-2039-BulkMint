@@ -1,5 +1,5 @@
 const { BigNumber } = require("@ethersproject/bignumber");
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const hre = require("hardhat");
 const bs58 = require('bs58');
 var MAP = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -309,71 +309,26 @@ describe('Testing Project', () => {
 
         it.only("MetaData Tests", async() => {
 
-            // await nft.mint(deployer.address);
-            // await nft.mint(deployer.address);
-            // await nft.mint(deployer.address);
-
             await nft.mintBulk(150, deployer.address);
-            await nft.mintBulk(150, deployer.address);
-            await nft.mintBulk(150, deployer.address);
-            
-            arrtemp = ["QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99"];
-            arr2 = ["ABCD"];
             //IPFS it 
             tempstring = "QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
-            arr2 = [tempstring, tempstring, tempstring];
-            //Base58
 
-           // val = hre.ethers.utils.arrayify('QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99');
-            console.log("My val");
-            let bytes = hre.ethers.utils.base58.decode(arr2[0]);
-         // const bytes2 = bs58.decode(arr2[0]);
-            console.log(bytes);
+            let bytes = hre.ethers.utils.base58.decode(tempstring);
+
             bytes = bytes.subarray(2, bytes.length);
-            console.log(bytes);
-            console.log(bytes.toString());
-            console.log(typeof(bytes));
-            console.log(hre.ethers.utils.base58.encode(bytes));
-           // console.log(bytes2);
-           // console.log(bytes.length);
 
-            // hexval  = bytes.toString('hex');
-
-            // console.log(hexval);
-            // console.log(hexval.slice(4));
-
-            // temp2= hexval.slice(4);
-
-            // tempbuffer = [Buffer.from(temp2)];
-            
-    
-            // console.log(tempbuffer);
-            // console.log(tempbuffer[0].length);
-            // finalarr = [temp2, temp2];
-            // console.log(temp2.length);
-
-            console.log("Second Log");
             let ipfshashes = [];
-            for (var i = 0; i < 450; i++) {
+            for (var i = 0; i < 150; i++) {
                 ipfshashes.push(bytes);
             }
-           // const bytes2 = Buffer.from(hexval, 'hex');
-           // reconvert = bs58.encode(bytes2);
-           // console.log(reconvert);
 
-            //console.log(val);
-            // decoded1 = from_b58(tempstring, MAP);
-            // console.log(decoded1);
-            // decoded = toHexString(from_b58(tempstring, MAP)).toUpperCase();
-            // console.log(decoded);
-            // console.log(decoded.length);
             await metadata.storeMetadata(ipfshashes);
-
-            console.log('stored it all');
 
             uri = await metadata.getTokenURI(149);
             
             console.log(uri);
+            //TODO: check that the uri is correct
+            assert(false);
 
         });
 

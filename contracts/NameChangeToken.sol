@@ -9,7 +9,7 @@ import "hardhat/console.sol";
 
 /**
  *
- * NameChangeToken Contract (The native token of Hashmasks)
+ * NameChangeToken Contract (The native token of NFT)
  * @dev Extends standard ERC20 contract
  */
 contract NameChangeToken is Context, IERC20 {
@@ -40,7 +40,7 @@ contract NameChangeToken is Context, IERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    address private _masksAddress;
+    address private _nftAddress;
 
     /**
      * @dev Sets the values for {name} and {symbol}, initializes {decimals} with
@@ -106,15 +106,15 @@ contract NameChangeToken is Context, IERC20 {
     }
 
     /**
-     * @dev When accumulated NCTs have last been claimed for a Hashmask index
+     * @dev When accumulated NCTs have last been claimed for a NFT index
      */
     function lastClaim(uint256 tokenIndex) public view returns (uint256) {
         require(
-            IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0),
+            IERC721Enumerable(_nftAddress).ownerOf(tokenIndex) != address(0),
             "Owner cannot be 0 address"
         );
         require(
-            tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(),
+            tokenIndex < IERC721Enumerable(_nftAddress).totalSupply(),
             "NFT at index has not been minted yet"
         );
 
@@ -125,7 +125,7 @@ contract NameChangeToken is Context, IERC20 {
     }
 
     /**
-     * @dev Accumulated NCT tokens for a Hashmask token index.
+     * @dev Accumulated NCT tokens for a NFT token index.
      */
     function accumulated(uint256 tokenIndex) public view returns (uint256) {
         require(
@@ -133,11 +133,11 @@ contract NameChangeToken is Context, IERC20 {
             "Emission has not started yet"
         );
         require(
-            IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) != address(0),
+            IERC721Enumerable(_nftAddress).ownerOf(tokenIndex) != address(0),
             "Owner cannot be 0 address"
         );
         require(
-            tokenIndex < IERC721Enumerable(_masksAddress).totalSupply(),
+            tokenIndex < IERC721Enumerable(_nftAddress).totalSupply(),
             "NFT at index has not been minted yet"
         );
 
@@ -149,13 +149,10 @@ contract NameChangeToken is Context, IERC20 {
         uint256 accumulationPeriod = block.timestamp < emissionEnd
             ? block.timestamp
             : emissionEnd; // Getting the min value of both
-        uint256 temp = accumulationPeriod.sub(lastClaimed);
-        // console.log(temp);
         uint256 totalAccumulated = accumulationPeriod
         .sub(lastClaimed)
         .mul(emissionPerDay)
         .div(SECONDS_IN_A_DAY);
-        // console.log(totalAccumulated);
         // If claim hasn't been done before for the index, add initial allotment (plus prereveal multiplier if applicable)
         if (lastClaimed == emissionStart) {
             uint256 initialAllotment = INITIAL_ALLOTMENT;
@@ -168,14 +165,14 @@ contract NameChangeToken is Context, IERC20 {
     /**
      * @dev Permissioning not added because it is only callable once. It is set right after deployment and verified.
      */
-    function setNFTAddress(address masksAddress) public {
-        require(_masksAddress == address(0), "Already set");
+    function setNFTAddress(address nftAddress) public {
+        require(_nftAddress == address(0), "Already set");
 
-        _masksAddress = masksAddress;
+        _nftAddress = nftAddress;
     }
 
     /**
-     * @dev Claim mints NCTs and supports multiple Hashmask token indices at once.
+     * @dev Claim mints NCTs and supports multiple NFT token indices at once.
      */
     function claim(uint256[] memory tokenIndices) public returns (uint256) {
         require(
@@ -187,8 +184,7 @@ contract NameChangeToken is Context, IERC20 {
         for (uint256 i = 0; i < tokenIndices.length; i++) {
             // Sanity check for non-minted index
             require(
-                tokenIndices[i] <
-                    IERC721Enumerable(_masksAddress).totalSupply(),
+                tokenIndices[i] < IERC721Enumerable(_nftAddress).totalSupply(),
                 "NFT at index has not been minted yet"
             );
             // Duplicate token index check
@@ -201,7 +197,7 @@ contract NameChangeToken is Context, IERC20 {
 
             uint256 tokenIndex = tokenIndices[i];
             require(
-                IERC721Enumerable(_masksAddress).ownerOf(tokenIndex) ==
+                IERC721Enumerable(_nftAddress).ownerOf(tokenIndex) ==
                     msg.sender,
                 "Sender is not the owner"
             );
@@ -285,8 +281,8 @@ contract NameChangeToken is Context, IERC20 {
         uint256 amount
     ) public virtual override returns (bool) {
         _transfer(sender, recipient, amount);
-        // Approval check is skipped if the caller of transferFrom is the Hashmasks contract. For better UX.
-        if (msg.sender != _masksAddress) {
+        // Approval check is skipped if the caller of transferFrom is the NFT contract. For better UX.
+        if (msg.sender != _nftAddress) {
             _approve(
                 sender,
                 _msgSender(),

@@ -52,24 +52,27 @@ contract ERC721 is
     mapping(string => bool) private _nameReserved;
 
     // Mapping from tokenIds to tokenURIs
-    //xasdsadasdasdas
     mapping(uint256 => bytes) private _tokenURIs;
 
+    // Address of the NCT contract
     address private _nctAddress;
 
+    // Price for each name change
     uint256 public constant NAME_CHANGE_PRICE = 1830 * (10**18);
 
+    // Name of the NFT token
     string public name;
 
+    // Symbol of the NFT token
     string public symbol;
 
+    // Returns the current total token supply
     uint256 public override totalSupply;
 
-    address private BURN_ADDRESS = 0xc0a227a440aA6432aFeC59423Fd68BD00cAbB529;
+    // Address where tokens can be burnt
+    address private BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
 
     bytes4 private constant _InterfaceId_ERC721 = 0x80ac58cd;
-
-    string private BASEURI = "https://ipfs.infura.io/ipfs/";
 
     /*
      * 0x80ac58cd ===
@@ -267,84 +270,10 @@ contract ERC721 is
         );
     }
 
-    // function tokenURI(uint256 _tokenId)
-    //     public
-    //     view
-    //     override
-    //     returns (string memory _uri)
-    // {
-    //     string memory baseuri = BASEURI;
-
-    //     // return string(abi.encodePacked(baseuri, temp));
-    //     return string(abi.encodePacked(baseuri, _tokenURIs[_tokenId]));
-    // }
-
     /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
     /// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
     ///  3986. The URI may point to a JSON file that conforms to the "ERC721
     ///  Metadata JSON Schema".
-
-    //Neo Pets
-    //Pokemon
-    /*
-    function tok(uint256 _tokenId)
-        public
-        view
-        
-        returns (bytes memory _uri)
-    {
-        require(_exists(_tokenId), "ERC721 :: tokenURI : token does not exist");
-        string memory temp = new string(50);
-        string memory baseuri = BASEURI;
-        string memory hardcodehash = "QmRjANc5rCFECnc479uccVQUk3jFHzm3DsT5T1oThkaKsn";
-        bytes memory bytesTemp; 
-       // stringToBytes(96, bytes(hardcodehash), bytesTemp);
-       // stringToBytes(_offst, _input, _output);
-        bytes memory t;
-       // bytes memory bytesTemp = _tokenURIs[_tokenId];
-        bytesToString(96, bytesTemp, bytes(temp));
-        console.log(temp);
-        t = abi.encodePacked(bytes(baseuri), string(bytes(hardcodehash)));
-        console.log(string(t));
-        bytes[1] memory te = [t];
-        return te;
-      
-    }
-    */
-
-    // function setTokenURI(uint256 _tokenId, bytes memory _uri)
-    //     public
-    //     onlyOwner()
-    // {
-    //     require(
-    //         _exists(_tokenId),
-    //         "ERC721 :: setTokenURI : token does not exist"
-    //     );
-    //     _tokenURIs[_tokenId] = _uri;
-    // }
-
-    /*
-    function setBulkTokenURI(uint256 _tokenIdStart, uint256 _tokenIdStop, bytes memory _uri) public onlyOwner()
-    {
-
-    }
-    */
-
-    /*
-        function setBulkTokenUris(
-        uint256 startToken,
-        uint256 quantity,
-        bytes[] calldata tokenUriArr
-    ) public onlyOwner() {
-
-        require(startToken + quantity <= totalSupply, "setBultTokenUris: Token Not Minted");
-        //47 is the hash and you wan to store the hash
-        for(uint256 i=startToken; i < startToken + quantity; i++) {
-
-            _tokenURIs[i] = tokenUriArr;
-        }
-    }
-*/
 
     /// @notice Enumerate NFTs assigned to an owner
     /// @dev Throws if `_index` >= `balanceOf(_owner)` or if
@@ -656,7 +585,7 @@ contract ERC721 is
         address from,
         uint256 tokenId,
         bytes calldata data
-    ) external override returns (bytes4) {
+    ) external pure override returns (bytes4) {
         return _ERC721_RECEIVED;
     }
 }
