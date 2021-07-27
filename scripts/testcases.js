@@ -79,6 +79,11 @@ const divUp = (x, y) => {
     }
     return z + 1n
 }
+
+const checkStringEquality = (result, expected) => {
+    // 
+    expect(String(result)).to.equal(String(expected))
+}
   
 const checkBigIntEquality = (result, expected) => {
     // 
@@ -307,8 +312,10 @@ describe('Testing Project', () => {
 
         });
 
-        it.only("MetaData Tests", async() => {
+        it("MetaData Tests", async() => {
 
+            baseuri = "https://ipfs.infura.io/ipfs/";
+            suffix = "/";
             await nft.mintBulk(150, deployer.address);
             //IPFS it 
             tempstring = "QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
@@ -325,12 +332,186 @@ describe('Testing Project', () => {
             await metadata.storeMetadata(ipfshashes);
 
             uri = await metadata.getTokenURI(149);
-            
-            console.log(uri);
-            //TODO: check that the uri is correct
-            assert(false);
+
+            comparestring = baseuri + tempstring + suffix;
+        
+            checkStringEquality(uri , comparestring);
 
         });
+
+        it("MetaData Tests with different hashes", async() => {
+            hash1 = "QmaKxXdhBcC19iFYS18fb9Ne2uPpPTtLHsSZhzxMG3Xgyp";
+            hash2 = "QmQQwn1J5REYtohBtGe2WQC5j3WeQWM7dBVgP7auoNypSx";
+            hash3 = "QmQuVu5bhWooVNwekpKohrQrEH8HSV3vE1D6eXrdspUXe7";
+            hash4 = "QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
+
+            baseuri = "https://ipfs.infura.io/ipfs/";
+            suffix = "/";
+
+            await nft.mintBulk(150, deployer.address);
+
+            let bytes1 = hre.ethers.utils.base58.decode(hash1);
+            let bytes2 = hre.ethers.utils.base58.decode(hash2);
+            let bytes3 = hre.ethers.utils.base58.decode(hash3);
+            let bytes4 = hre.ethers.utils.base58.decode(hash4);
+
+            bytes1 = bytes1.subarray(2, bytes1.length);
+            bytes2 = bytes2.subarray(2, bytes2.length);
+            bytes3 = bytes3.subarray(2, bytes3.length);
+            bytes4 = bytes4.subarray(2, bytes4.length);
+
+            bytesarr = [bytes1, bytes2, bytes3, bytes4];
+            let ipfshashes = [];
+            for (var i = 0; i < 150; i++) {
+                ipfshashes.push(bytesarr[i%4]);
+            }
+
+            await metadata.storeMetadata(ipfshashes);
+
+            uri1 = await metadata.getTokenURI(0);
+            uri2 = await metadata.getTokenURI(1);
+            uri3 = await metadata.getTokenURI(2);
+            uri4 = await metadata.getTokenURI(3);
+
+            comparestring1 = baseuri + hash1 + suffix;
+            comparestring2 = baseuri + hash2 + suffix;
+            comparestring3 = baseuri + hash3 + suffix;
+            comparestring4 = baseuri + hash4 + suffix;
+
+            checkStringEquality(uri1 , comparestring1);
+            checkStringEquality(uri2 , comparestring2);
+            checkStringEquality(uri3 , comparestring3);
+            checkStringEquality(uri4 , comparestring4);
+
+            uri1 = await metadata.getTokenURI(20);
+            uri2 = await metadata.getTokenURI(21);
+            uri3 = await metadata.getTokenURI(22);
+            uri4 = await metadata.getTokenURI(23);
+
+            checkStringEquality(uri1 , comparestring1);
+            checkStringEquality(uri2 , comparestring2);
+            checkStringEquality(uri3 , comparestring3);
+            checkStringEquality(uri4 , comparestring4);
+
+
+        });
+
+        it("NameChange Tests Basic", async() => {
+
+            name1 = "NEOPETS1";
+            ncp = await nft.NAME_CHANGE_PRICE();
+
+            await nft.mint(deployer.address);
+            await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            await nct.claim([0]);
+
+            //temp = await nft.tokenNameByIndex(0);
+            balance1 = await nct.balanceOf(deployer.address);
+
+            await nft.changeName(0, name1);
+
+            balance2 = await nct.balanceOf(deployer.address);
+
+            diff = balance1.sub(balance2);
+
+            checkBigIntEquality(diff, ncp);
+
+            tempname = await nft.tokenNameByIndex(0);
+            checkStringEquality(name1, tempname);
+
+        });
+
+        it("NameChange Tests Advanced", async() => {
+
+            name1 = "NEOPETS1";
+            name2 = "NEOPETS2";
+            name3 = "NEOPETS3";
+            ncp = await nft.NAME_CHANGE_PRICE();
+
+            await nft.mint(deployer.address);
+            await nft.mint(deployer.address);
+            await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            await nct.claim([0]);
+
+            //temp = await nft.tokenNameByIndex(0);
+            balance1 = await nct.balanceOf(deployer.address);
+
+            await nft.changeName(0, name1);
+
+            balance2 = await nct.balanceOf(deployer.address);
+
+            diff = balance1.sub(balance2);
+
+            checkBigIntEquality(diff, ncp);
+
+            tempname = await nft.tokenNameByIndex(0);
+            checkStringEquality(name1, tempname);
+
+            await expect(nft.changeName(0, name1)).to.be.reverted;
+
+            await expect(nft.changeName(1, name1)).to.be.reverted;
+
+        });
+
+        it("NameChange Tests Without Balance", async() => {
+
+            name1 = "NEOPETS1";
+            name2 = "NEOPETS2";
+            name3 = "NEOPETS3";
+            ncp = await nft.NAME_CHANGE_PRICE();
+
+            await nft.mint(deployer.address);
+            await nft.mint(deployer.address);
+            await hre.network.provider.send("evm_increaseTime", [86400]);
+
+            await expect(nft.changeName(0, name1)).to.be.reverted;
+
+        });
+
+        it.only("NameChange Tests After Emission End", async() => {
+
+            name1 = "NEOPETS1";
+            name2 = "NEOPETS2";
+            name3 = "NEOPETS3";
+            ncp = await nft.NAME_CHANGE_PRICE();
+
+            await nft.mint(deployer.address);
+            await hre.network.provider.send("evm_increaseTime", [86400 * 365 * 10]);
+
+            await nct.claim([0]);
+
+            await expect(nct.claim([0])).to.be.reverted;
+
+            balance = await nct.balanceOf(deployer.address);
+
+            console.log(balance.toString());
+
+            //BURN ALL THE TOKEN TO CHANGE NAMES
+            i=1;
+            while(true) {
+
+                balance = await nct.balanceOf(deployer.address);
+                if (balance.sub(ncp) >= 0) {
+                    tempname = name1 + i.toString();
+                    await nft.changeName(0, tempname);
+                    i++;
+                    
+                }
+                else {
+                    await expect(nft.changeName(0, name1)).to.be.reverted;
+                    break;
+                }
+
+            }
+           // expect(claimQtyTemp).to.equal(0);
+
+            //await expect(nft.changeName(0, name1)).to.be.reverted;
+
+        });
+
+
 
     } )
 });
