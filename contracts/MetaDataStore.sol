@@ -17,10 +17,10 @@ contract MetadataStore is Ownable {
     bytes internal constant _ALPHABET =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    constructor(address nftAddress) {
+    constructor(address nftAddress, string memory  baseuriprefix, string memory baseurisuffix) {
         _nftaddress = nftAddress;
-        BASE_URI_PREFIX = "https://ipfs.infura.io/ipfs/";
-        BASE_URI_SUFFIX = "/";
+        BASE_URI_PREFIX = baseuriprefix;
+        BASE_URI_SUFFIX = baseurisuffix;
     }
 
     /*
