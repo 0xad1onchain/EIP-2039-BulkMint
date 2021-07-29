@@ -40,7 +40,7 @@ contract NameChangeToken is Context, IERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    address private _nftAddress;
+    address public _nftAddress;
 
     /**
      * @dev Sets the values for {name} and {symbol}, initializes {decimals} with

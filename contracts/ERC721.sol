@@ -55,7 +55,7 @@ contract ERC721 is
     mapping(uint256 => bytes) private _tokenURIs;
 
     // Address of the NCT contract
-    address private _nctAddress;
+    address public _nctAddress;
 
     // Price for each name change
     uint256 public constant NAME_CHANGE_PRICE = 1830 * (10**18);

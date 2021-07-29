@@ -8,7 +8,7 @@ contract MetadataStore is Ownable {
     // Public variables
 
     bytes32[] public ipfsHashes;
-    address private _nftaddress;
+    address public _nftaddress;
     string private BASE_URI_PREFIX;
     string private BASE_URI_SUFFIX;
     bytes2 private CONSTANT = 0x1220;
