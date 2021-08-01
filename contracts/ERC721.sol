@@ -1,3 +1,4 @@
+/// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.1;
 
 import "./interfaces/IERC721.sol";
@@ -11,7 +12,6 @@ import "./libs/SafeMath.sol";
 import "./libs/Address.sol";
 import "./libs/Ownable.sol";
 import "./libs/EnumerableSet.sol";
-import "hardhat/console.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -580,11 +580,20 @@ contract ERC721 is
         _nameReserved[toLower(str)] = isReserve;
     }
 
+
+    // Implementing on ERC721 Received with following singature 
+    // Required to make contract safeReceive ERC721 tokens
+    // function onERC721Received(
+    //     address operator,
+    //     address from,
+    //     uint256 tokenId,
+    //     bytes calldata data
+    // ) external pure override returns (bytes4)
     function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
+        address,
+        address,
+        uint256,
+        bytes calldata
     ) external pure override returns (bytes4) {
         return _ERC721_RECEIVED;
     }

@@ -1,3 +1,4 @@
+/// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.1;
 
 import "./interfaces/IERC165.sol";
@@ -5,7 +6,7 @@ import "./libs/SafeMath.sol";
 import "./interfaces/IERC20.sol";
 import "./libs/Context.sol";
 import "./interfaces/IERC721Enumerable.sol";
-import "hardhat/console.sol";
+
 
 /**
  *
@@ -51,9 +52,9 @@ contract NameChangeToken is Context, IERC20 {
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(string memory name, string memory symbol) {
-        _name = name;
-        _symbol = symbol;
+    constructor(string memory cname, string memory csymbol) {
+        _name = cname;
+        _symbol = csymbol;
         _decimals = 18;
         emissionStart = block.timestamp;
         emissionEnd = emissionStart + (86400 * 365 * 10);

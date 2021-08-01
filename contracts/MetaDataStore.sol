@@ -1,8 +1,9 @@
+/// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.1;
 
 import "./libs/Ownable.sol";
 import "./interfaces/IERC721Enumerable.sol";
-import "hardhat/console.sol";
+
 
 contract MetadataStore is Ownable {
     // Public variables
@@ -29,7 +30,7 @@ contract MetadataStore is Ownable {
     Ownership is intended to be burned (Renounced) after storage is completed
     */
     function storeMetadata(bytes32[] memory ipfsHashInHex) public onlyOwner {
-        console.log("started storing metadata");
+
         require(
             IERC721Enumerable(_nftaddress).totalSupply() >=
                 (ipfsHashes.length + ipfsHashInHex.length),
@@ -47,9 +48,22 @@ contract MetadataStore is Ownable {
     {
         require(tokenIndex < ipfsHashes.length, "MetaData Does Not Exist");
         //Hex to Base58
-        bytes memory temp = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
+        bytes memory ipfsHash = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
         result = string(
-            abi.encodePacked(BASE_URI_PREFIX, _toBase58(temp), BASE_URI_SUFFIX)
+            abi.encodePacked(BASE_URI_PREFIX, _toBase58(ipfsHash), BASE_URI_SUFFIX)
+        );
+    }
+
+    function getIPFSHashHexAtIndex(uint256 tokenIndex)
+        public
+        view
+        returns (string memory result)
+    {
+        require(tokenIndex < ipfsHashes.length, "MetaData Does Not Exist");
+        //Hex to Base58
+        bytes memory ipfsHash = abi.encodePacked(CONSTANT, ipfsHashes[tokenIndex]);
+        result = string(
+            abi.encodePacked(_toBase58(ipfsHash))
         );
     }
 

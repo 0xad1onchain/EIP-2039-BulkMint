@@ -138,7 +138,7 @@ describe('Testing Project', () => {
         await nct.setNFTAddress(nft.address);
 
         MetaDataContract = await hre.ethers.getContractFactory("MetadataStore");
-        metadata = await MetaDataContract.deploy(nft.address);
+        metadata = await MetaDataContract.deploy(nft.address, "https://ipfs.infura.io/ipfs/", "/");
 
         await metadata.deployed();
        
@@ -270,14 +270,6 @@ describe('Testing Project', () => {
             v4 = v3.add(initalAllotment);
             checkBigIntEquality(v4, balance);
 
-            // await nft.mint(deployer.address);
-
-            // await hre.network.provider.send("evm_increaseTime", [86400]);
-
-            // await nct.claim([0,1]);
-
-            // const TimeStamp2 = await getLatestTimeStamp();
-
         });
 
         it("Tests with NCT for Multiple Token", async () => {
@@ -302,14 +294,6 @@ describe('Testing Project', () => {
             v5 = v4.mul(bulkQty);
             checkBigIntEquality(v5, balance);
 
-            // await nft.mint(deployer.address);
-
-            // await hre.network.provider.send("evm_increaseTime", [86400]);
-
-            // await nct.claim([0,1]);
-
-            // const TimeStamp2 = await getLatestTimeStamp();
-
         });
 
         it("MetaData Tests", async() => {
@@ -317,7 +301,7 @@ describe('Testing Project', () => {
             baseuri = "https://ipfs.infura.io/ipfs/";
             suffix = "/";
             await nft.mintBulk(150, deployer.address);
-            //IPFS it 
+  
             tempstring = "QmRHrPGvS94kr2QCYvviFCVAgKoQ3xMBgxN53dM9zXiG99";
 
             let bytes = hre.ethers.utils.base58.decode(tempstring);
@@ -406,7 +390,7 @@ describe('Testing Project', () => {
 
             await nct.claim([0]);
 
-            //temp = await nft.tokenNameByIndex(0);
+
             balance1 = await nct.balanceOf(deployer.address);
 
             await nft.changeName(0, name1);
@@ -435,7 +419,6 @@ describe('Testing Project', () => {
 
             await nct.claim([0]);
 
-            //temp = await nft.tokenNameByIndex(0);
             balance1 = await nct.balanceOf(deployer.address);
 
             await nft.changeName(0, name1);
@@ -470,7 +453,7 @@ describe('Testing Project', () => {
 
         });
 
-        it.only("NameChange Tests After Emission End", async() => {
+        it("NameChange Tests After Emission End", async() => {
 
             name1 = "NEOPETS1";
             name2 = "NEOPETS2";
@@ -486,9 +469,6 @@ describe('Testing Project', () => {
 
             balance = await nct.balanceOf(deployer.address);
 
-            console.log(balance.toString());
-
-            //BURN ALL THE TOKEN TO CHANGE NAMES
             i=1;
             while(true) {
 
@@ -505,9 +485,6 @@ describe('Testing Project', () => {
                 }
 
             }
-           // expect(claimQtyTemp).to.equal(0);
-
-            //await expect(nft.changeName(0, name1)).to.be.reverted;
 
         });
 

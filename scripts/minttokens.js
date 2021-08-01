@@ -5,14 +5,11 @@ const uploadNFt = require("./upload.js");
 
 
 async function uploadFiles(taskArgs, hre) {
-    console.log(taskArgs);
+   
     qty = parseInt(taskArgs.quantity);
-    console.log(qty);
+
     directorypath = (taskArgs.nftdirectory).toString();
-    console.log("after path");
-    console.log(directorypath);
-    console.log("Above \n");
-    console.log(directorypath);
+    
     const  [deployer, addr1, addr2] = await hre.ethers.getSigners();
 
     deployments = JSON.parse(fs.readFileSync("deployment.txt", 'utf8'));
@@ -20,29 +17,32 @@ async function uploadFiles(taskArgs, hre) {
     metadatacontract = deployments.MetaDataContract;
     nftcontract = nftcontract.toString();
     metadatacontract = metadatacontract.toString();
-    console.log(nftcontract);
+    
+    console.log("Found NFT Contract at", nftcontract);
+    console.log("Found Meta Data Contract at", metadatacontract);
 
     if(directorypath.slice(-1) != "/")
         directorypath = directorypath + "/";
 
     NFTContract = await hre.ethers.getContractAt("ERC721" , nftcontract);
-    console.log(metadatacontract);
+
     MetaDataContract = await hre.ethers.getContractAt("MetadataStore", metadatacontract);
 
-    console.log("Total Supply");
     totalSupply = await NFTContract.connect(deployer).totalSupply();
     totalSupply = parseInt(totalSupply);
-    console.log(totalSupply.toString());
 
-    console.log("Dir path is");
-    console.log(directorypath);
+    console.log("Current Total Supply is ", totalSupply.toString());
+
     begin = totalSupply;
     end = totalSupply + qty;
+    console.log("Validating ASSET from id", begin , "to", end -1);
+
     for (i = begin; i < end; i++) {
 
         filepath = directorypath + CONFIG.NFT_FILE_PREFIX + i.toString() + CONFIG.NFT_FILE_SUFFIX;
         if (!fs.existsSync(filepath)) {
             console.log("ERROR NFT FILE DOES NOT EXIST FOR INDEX", i);
+            console.log("\nABORTING\n");
             return;
         }
     }
@@ -57,27 +57,37 @@ async function uploadFiles(taskArgs, hre) {
         hashArray.push(hash);
     }
 
-    await NFTContract.connect(deployer).mintBulk(qty, deployer.address);
+    console.log("Bulk Minting NFTs ");
 
-    base58Array = [];
+    tx = await NFTContract.connect(deployer).mintBulk(qty, deployer.address);
+    await tx.wait();
+
+    console.log("Bulk Mint Transaction is");
+    console.log(tx);
+
+    bytes32Array = [];
 
     for(i=0; i<qty; i++) {
         temp = hashArray[i];
         let bytes1 = hre.ethers.utils.base58.decode(temp);
         bytes1 = bytes1.subarray(2, bytes1.length);
-        base58Array.push(bytes1);
+        bytes32Array.push(bytes1);
     }
 
-    await MetaDataContract.connect(deployer).storeMetadata(base58Array);
+    console.log("Storing MetaData for newly minted NFTs");
 
-    console.log( "COmplete");
+    tx = await MetaDataContract.connect(deployer).storeMetadata(bytes32Array);
+    await tx.wait();
+
+    console.log("Meta Data Stored, Transaction Summary is");
+    console.log(tx);
 
 }
 
-async function mintNFTs(taskArgs, hre) {
-    console.log("Here");
+async function minter(taskArgs, hre) {
+
     await uploadFiles(taskArgs, hre);
 }
 module.exports =  {
-    mintNFTs,
+    minter,
 }
