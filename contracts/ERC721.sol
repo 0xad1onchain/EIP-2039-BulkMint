@@ -5,6 +5,7 @@ import "./interfaces/IERC721.sol";
 import "./interfaces/IERC721Receiver.sol";
 import "./interfaces/IERC721Metadata.sol";
 import "./interfaces/IERC721Enumerable.sol";
+import "./interfaces/IERC721Metadata.sol";
 import "./interfaces/IERC2309.sol";
 import "./interfaces/IERC20.sol";
 import "./libs/ERC165.sol";
@@ -21,6 +22,7 @@ contract ERC721 is
     ERC165,
     IERC721,
     IERC721Enumerable,
+    IERC721Metadata,
     IERC721Receiver,
     Ownable,
     IERC2309
@@ -61,10 +63,10 @@ contract ERC721 is
     uint256 public constant NAME_CHANGE_PRICE = 1830 * (10**18);
 
     // Name of the NFT token
-    string public name;
+    string public override name;
 
     // Symbol of the NFT token
-    string public symbol;
+    string public override symbol;
 
     // Returns the current total token supply
     uint256 public override totalSupply;
@@ -580,8 +582,7 @@ contract ERC721 is
         _nameReserved[toLower(str)] = isReserve;
     }
 
-
-    // Implementing on ERC721 Received with following singature 
+    // Implementing on ERC721 Received with following singature
     // Required to make contract safeReceive ERC721 tokens
     // function onERC721Received(
     //     address operator,
@@ -596,5 +597,15 @@ contract ERC721 is
         bytes calldata
     ) external pure override returns (bytes4) {
         return _ERC721_RECEIVED;
+    }
+
+    function tokenURI(uint256 _tokenId)
+        external
+        view
+        override
+        returns (string memory _uri)
+    {
+        string memory data = "https://api.crazylizardarmy.com/lizard/3";
+        return data;
     }
 }

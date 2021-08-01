@@ -10,7 +10,7 @@ async function uploadFiles(taskArgs, hre) {
 
     directorypath = (taskArgs.nftdirectory).toString();
     
-    const  [deployer, addr1, addr2] = await hre.ethers.getSigners();
+    const  [deployer] = await hre.ethers.getSigners();
 
     deployments = JSON.parse(fs.readFileSync("deployment.txt", 'utf8'));
     nftcontract = deployments.NFTContract;

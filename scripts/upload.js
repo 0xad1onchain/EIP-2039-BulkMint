@@ -1,8 +1,6 @@
-const fs = require('fs/promises');
+const fs = require('fs').promises;
 const path = require('path');
 const CONFIG = require("../project.config.js");
-
-const { create } = require('ipfs-http-client')
 
 const ipfsAddOptions = {
     cidVersion: 0,

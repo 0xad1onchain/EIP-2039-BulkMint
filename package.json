@@ -1,17 +1,22 @@
 {
-  "name": "hardhat-project",
+  "name": "NFT Minter",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.4",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.1",
     "hardhat": "^2.4.3",
     "ipfs-api": "^26.1.2",
-    "ipfs-http-client": "^50.0.0"
+    "web3": "^1.5.0",
+    "fs.promises": "0.1.2"
   },
   "dependencies": {
-    "bs58": "^4.0.1"
+    "opensea-js": "^1.1.11",
+    "@0x/subproviders": "^6.4.1",
+    "eth-gas-reporter": "^0.2.17",
+    "eth-sig-util": "^3.0.1"
   }
 }
