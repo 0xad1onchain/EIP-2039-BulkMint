@@ -37,6 +37,10 @@ async function listNFTs(taskArgs, hre) {
 
     prices = JSON.parse(fs.readFileSync(taskArgs.pricelist, 'utf8'));
 
+    if (CONFIG.OPENSEA_USE_ERC20) {
+        const token = (await seaport.api.getPaymentTokens({ symbol: CONFIG.OPENSEA_ERC20_SYMBOL})).tokens[0];
+    }
+   
     for (var token in prices) {
        
         if (parseInt(token) < totalSupply) {
@@ -51,6 +55,11 @@ async function listNFTs(taskArgs, hre) {
                 endAmount: parseFloat(prices[token]),
                 expirationTime: 0
             };
+
+            if(CONFIG.OPENSEA_USE_ERC20) {
+                const token = (await seaport.api.getPaymentTokens({symbol: CONFIG.OPENSEA_ERC20_SYMBOL})).tokens[0];
+                input["payment_token_address"] = token.address;
+            }
             
             try {
                 let listing = await seaport.createSellOrder(input);
@@ -59,6 +68,7 @@ async function listNFTs(taskArgs, hre) {
             }
         }
     }
+
 }
 
 async function list(taskArgs, hre, web3) {
