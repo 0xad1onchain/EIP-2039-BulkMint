@@ -57,7 +57,8 @@ async function listNFTs(taskArgs, hre) {
             };
 
             if(CONFIG.OPENSEA_USE_ERC20) {
-                const token = (await seaport.api.getPaymentTokens({symbol: CONFIG.OPENSEA_ERC20_SYMBOL})).tokens[0];
+                const token = (await seaport.api.getPaymentTokens({symbol: CONFIG.OPENSEA_ERC20_SYMBOL}));
+                console.log(token);
                 input["payment_token_address"] = token.address;
             }
             

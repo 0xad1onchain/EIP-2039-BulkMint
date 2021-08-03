@@ -73,12 +73,15 @@ The asset files may have a suffix and a prefix depending upon the file format an
 /*
 The expected asset file name pattern is
 [PREFIX][TOKENID][SUFFIX]
+
 Example NFT1.jpg
-PREFIX - NFT
-SUFFIX - jpg
-Example 1
+PREFIX - "NFT"
+SUFFIX - ".jpg"
+
+Example 1.png
 PREFIX = ""
-SUFFIX = ""
+SUFFIX = ".png"
+
 Token ID is mandatory
 */
 
@@ -123,7 +126,7 @@ The Standard Practice of hosting NFTs is via IPFS. These below options help to c
 ```
 ```JavaScript
 /*
-The Config Options below specify the NODE URL to access particular ETHEREUM network. It is recommended to use INFURA as the API provider to access ETHEREUM Network. The URLs for the network can be obtained by signing up on INFURA to get the api key. "https:infura.io" 
+The Config Options below specify the NODE URL to access particular ETHEREUM network. It is recommended to use INFURA as the API provider to access ETHEREUM Network. The URLs for the network can be obtained by signing up on INFURA to get the api key. "https://infura.io" 
 */
 10. HOMESTEAD_URL: {
 	TYPE: STRING

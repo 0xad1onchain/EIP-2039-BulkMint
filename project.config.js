@@ -22,11 +22,14 @@ module.exports = {
     HOMESTEAD_URL: "https://eth-mainnet.alchemyapi.io/v2/a-5kxxGXc5MLJbOLmoLTDF3mh6IiJMBH", //REFER CONFIG OPTION 10 in README.md
     RINKEBY_URL: "https://rinkeby.infura.io/v3/eefe88ec80f74d33a52967249a8d4db1", //REFER CONFIG OPTION 11 in README.md
   
+
     ACCOUNT_NEMONIC: "journey female bring inject beauty strategy egg erupt noodle pledge pause lion", //REFER CONFIG OPTION 12 in README.md
+
 
     ETHERSCAN_API_KEY: "JE1H3QF86FX3B8KPECQH2SBDQR7ZFHH5PC", //REFER CONFIG OPTION 13 in README.md
     VERIFY_CONTRACT: true,  //REFER CONFIG OPTION 14 in README.md
 
+    
     OPENSEA_API_URL: "https://rinkeby-api.opensea.io/api/v1/", //REFER CONFIG OPTION 15 in README.md
     OPENSEA_API_KEY: "", //REFER CONFIG OPTION 16 in README.md
     OPENSEA_NETWORK: "rinkeby", // Either "main" or "rinkeby" //REFER CONFIG OPTION 17 in README.md
