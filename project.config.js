@@ -2,12 +2,12 @@
 //Refer to README.md
 
 module.exports = {
-    NFT_NAME: "Neo Pets NFT", //REFER CONFIG OPTION 1 in README.md
-    NFT_SYMBOL: "NPT", //REFER CONFIG OPTION 2 in README.md
+    NFT_NAME: "XYZ NFT", //REFER CONFIG OPTION 1 in README.md
+    NFT_SYMBOL: "XYZ", //REFER CONFIG OPTION 2 in README.md
 
 
-    NCT_NAME: "Neo Pets Name Change Token", //REFER CONFIG OPTION 3 in README.md
-    NCT_SYMBOL: "NCT", //REFER CONFIG OPTION 4 in README.md
+    NCT_NAME: "XYZ NCT Token", //REFER CONFIG OPTION 3 in README.md
+    NCT_SYMBOL: "XYZCT", //REFER CONFIG OPTION 4 in README.md
 
 
     NFT_FILE_PREFIX: "", //REFER CONFIG OPTION 5 in README.md
@@ -29,11 +29,11 @@ module.exports = {
     ETHERSCAN_API_KEY: "JE1H3QF86FX3B8KPECQH2SBDQR7ZFHH5PC", //REFER CONFIG OPTION 13 in README.md
     VERIFY_CONTRACT: true,  //REFER CONFIG OPTION 14 in README.md
 
-    
+
     OPENSEA_API_URL: "https://rinkeby-api.opensea.io/api/v1/", //REFER CONFIG OPTION 15 in README.md
     OPENSEA_API_KEY: "", //REFER CONFIG OPTION 16 in README.md
     OPENSEA_NETWORK: "rinkeby", // Either "main" or "rinkeby" //REFER CONFIG OPTION 17 in README.md
-    OPENSEA_USE_ERC20: true,  //Use false for native eth  //REFER CONFIG OPTION 18 in README.md
-    OPENSEA_ERC20_SYMBOL: "DAI", //Only valid if ERC20 true  //REFER CONFIG OPTION 19 in README.md
+    OPENSEA_USE_ERC20: false,  //Use false for native eth  //REFER CONFIG OPTION 18 in README.md
+    OPENSEA_ERC20_SYMBOL: "USDT", //Only valid if ERC20 true  //REFER CONFIG OPTION 19 in README.md
 
 };

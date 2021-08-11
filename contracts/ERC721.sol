@@ -605,7 +605,7 @@ contract ERC721 is
         override
         returns (string memory _uri)
     {
-        string memory data = "https://api.crazylizardarmy.com/lizard/3";
+        string memory data = "";
         return data;
     }
 }

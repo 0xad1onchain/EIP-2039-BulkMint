@@ -25,11 +25,25 @@ async function main() {
   
     await metadata.deployed();
 
+    console.log('NFT Contract deployed:', nft.address);
+    console.log('NCT Contract deployed:', nct.address);
+    console.log('Metadata Contract deployed:', metadata.address);
+    console.log('Owner of contract:', await nft.owner());
+
     deploymentDetais = {
         "NFTContract" : nft.address,
         "NCTContract" : nct.address,
         "MetaDataContract": metadata.address,
     };
+
+    fs.writeFileSync("./deployment.txt", JSON.stringify(deploymentDetais , null, 4), function(err) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("Addresses available at deployment.txt");
+        }
+    });
 
 
    if (CONFIG.VERIFY_CONTRACT) {
@@ -50,14 +64,7 @@ async function main() {
 
     }
 
-    fs.writeFileSync("./deployment.txt", JSON.stringify(deploymentDetais , null, 4), function(err) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log("Addresses available at deployment.txt");
-        }
-    });
+
 
 }
 

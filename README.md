@@ -5,7 +5,7 @@
 A JavaScript project for NFTs that allow the NFT owner to change the name of the NFT via a Name Change Token. A fixed amount of NCTs are accumulated per day for a given NFT owned by an owner. These tokens can later be spent for changing the name of the NFT. These NFTs can be listed on platforms like OpenSea and can be traded via ETH or any ERC20 token supported by the platform.
 
 
-Developed by [Aditya Gupta](https://github.com/ProjectOpenSea/opensea-js) and [Aditya Angadi](https://www.npmjs.com/package/opensea-js)
+Developed by [Aditya Gupta](https://github.com/adigupta13) and Aditya Angadi
 
   
 
@@ -400,7 +400,9 @@ Example  OPENSEA_ERC20_SYMBOL: "DAI"  //DAI Stable coin will be used to sell the
 ```Javascript
 	This additional step is required to create a priceList.json file that contains the price of asset NFTs to be used while they are being listed on OpenSea for Sale. The Structure of the File is very straightforward. 
 	{TokenId: Price}
+
 Example
+
 priceList.json
 {
 
@@ -457,7 +459,7 @@ The project can be deployed on mainnet/testnets via performing the following seq
 
 * Deploy and Verify the smart contracts on the network via `deploy.js` script
 
-* Bulk Mint the required number of NFTs via `minttokens.js` script
+* Bulk Mint the required number of NFTs via `mintTokens.js` script
 
 * List the NFTs for Sale on OpenSea platform via `listTokens.js` script 
 
@@ -488,6 +490,7 @@ The project can be deployed on mainnet/testnets via performing the following seq
 #### Bulk Mint the required number of NFTs (Can be executed repeatedly)
 
 	Execute the below command to BulkMint the NFTs the smart contracts on the selected network. You can execute the command again as and when there is need of minting NFTs
+	Maximum NFTs that can be minted are 150 in one command. Run this command multiple times to mint several NFTs
 	
 
 ```bash 
